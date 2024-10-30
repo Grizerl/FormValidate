@@ -6,9 +6,9 @@ class SignInScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     // Controllers for the text fields
-    final TextEditingController nameController = TextEditingController();
-    final TextEditingController emailController = TextEditingController();
-    final TextEditingController passwordController = TextEditingController();
+    final nameController = TextEditingController();
+    final emailController = TextEditingController();
+    final passwordController = TextEditingController();
 
     return Scaffold(
       body: Column(
@@ -97,7 +97,8 @@ class SignInScreen extends StatelessWidget {
                 ElevatedButton(
                   style: ElevatedButton.styleFrom(
                     side: const BorderSide(color: Colors.blue),
-                    foregroundColor: Colors.blue[800],
+                    backgroundColor: Colors.blue[800],
+                    foregroundColor: Colors.white,
                     shape: const RoundedRectangleBorder(
                       borderRadius: BorderRadius.zero,
                     ),

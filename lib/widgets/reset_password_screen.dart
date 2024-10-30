@@ -4,121 +4,120 @@ class ResetPasswordScreen extends StatefulWidget {
   const ResetPasswordScreen({super.key});
 
   @override
-  State<ResetPasswordScreen> createState() => _ResetPasswordScreenState();
+  _ResetPasswordScreenState createState() => _ResetPasswordScreenState();
 }
 
 class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
-  final _formKey = GlobalKey<FormState>();
-  String email = '';
-
-  String? _validateEmail(String? value) {
-    const String emailPattern =
-        r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$';
-    final RegExp regex = RegExp(emailPattern);
-    if (value == null || value.isEmpty) {
-      return 'Email is required';
-    } else if (!regex.hasMatch(value)) {
-      return 'Invalid email format';
-    }
-    return null;
-  }
+  final emailController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: Center(
-        child: Form(
-          key: _formKey,
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Image.network(
-                "https://upload.wikimedia.org/wikipedia/commons/thumb/4/44/Google-flutter-logo.svg/1024px-Google-flutter-logo.svg.png",
-                width: 200,
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Image.network(
+              "https://upload.wikimedia.org/wikipedia/commons/thumb/4/44/Google-flutter-logo.svg/1024px-Google-flutter-logo.svg.png",
+              width: 200,
+            ),
+            const SizedBox(height: 24),
+            const Text(
+              'Reset Password',
+              style: TextStyle(
+                fontSize: 17,
+                fontWeight: FontWeight.bold,
               ),
-              const SizedBox(height: 24),
-              const Text(
-                'Reset Password',
-                style: TextStyle(
-                  fontSize: 17,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: Column(
-                  children: [
-                    TextFormField(
-                      decoration: const InputDecoration(
-                        labelText: "Email",
-                        labelStyle: TextStyle(
-                          fontSize: 13,
-                          color: Colors.black,
-                        ),
-                        enabledBorder: OutlineInputBorder(
-                          borderSide: BorderSide(
-                            color: Colors.blue,
-                          ),
-                        ),
-                        focusedBorder: OutlineInputBorder(
-                          borderSide: BorderSide(
-                            color: Colors.blue,
-                            width: 2.0,
-                          ),
+            ),
+            Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Column(
+                children: [
+                  TextField(
+                    controller: emailController,
+                    decoration: const InputDecoration(
+                      labelText: "Email",
+                      labelStyle: TextStyle(
+                        fontSize: 13,
+                        color: Colors.black,
+                      ),
+                      enabledBorder: OutlineInputBorder(
+                        borderSide: BorderSide(
+                          color: Colors.blue,
                         ),
                       ),
-                      validator: _validateEmail, // Added validator
-                      onChanged: (value) {
-                        email = value;
-                      },
-                    ),
-                    const SizedBox(height: 24),
-                    ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.blue[800],
-                        foregroundColor: Colors.white,
-                        shape: const RoundedRectangleBorder(
-                          borderRadius: BorderRadius.zero,
+                      focusedBorder: OutlineInputBorder(
+                        borderSide: BorderSide(
+                          color: Colors.blue,
+                          width: 2.0,
                         ),
-                        minimumSize: const Size(500, 50),
                       ),
-                      onPressed: () {
-                        if (_formKey.currentState?.validate() ?? false) {
-                          showDialog(
-                            context: context,
-                            builder: (BuildContext ctx) {
-                              return const AlertDialog(
-                                title: Text('Message'),
-                                content: Text("Reset password email sent!"),
-                              );
-                            },
-                          );
-                        }
-                      },
-                      child: const Text("Reset"),
                     ),
-                    const SizedBox(height: 24),
-                    OutlinedButton(
-                      style: OutlinedButton.styleFrom(
-                        side: const BorderSide(color: Colors.blue),
-                        foregroundColor: Colors.blue[800],
-                        shape: const RoundedRectangleBorder(
-                          borderRadius: BorderRadius.zero,
-                        ),
-                        minimumSize: const Size(500, 50),
+                  ),
+                  const SizedBox(height: 24),
+                  ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.blue[800],
+                      foregroundColor: Colors.white,
+                      shape: const RoundedRectangleBorder(
+                        borderRadius: BorderRadius.zero,
                       ),
-                      onPressed: () => {
-                        Navigator.pop(context)
-                      },
-                      child: const Text("Back"),
+                      minimumSize: const Size(500, 50),
                     ),
-                  ],
-                ),
+                    onPressed: () {
+                      String email = emailController.text.trim();
+                      if (email.isEmpty) {
+                        _showDialog(context, 'Email field cannot be empty.');
+                      } else if (!_isValidEmail(email)) {
+                        _showDialog(context, 'Invalid email format.');
+                      } else {
+                        _showDialog(context, 'Reset link sent to $email');
+                      }
+                    },
+                    child: const Text("Reset"),
+                  ),
+                  const SizedBox(height: 24),
+                  OutlinedButton(
+                    style: OutlinedButton.styleFrom(
+                      side: const BorderSide(color: Colors.blue),
+                      foregroundColor: Colors.blue[800],
+                      shape: const RoundedRectangleBorder(
+                        borderRadius: BorderRadius.zero,
+                      ),
+                      minimumSize: const Size(500, 50),
+                    ),
+                    onPressed: () => Navigator.pop(context),
+                    child: const Text("Back"),
+                  ),
+                ],
               ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
+    );
+  }
+
+  bool _isValidEmail(String email) {
+    final RegExp regex = RegExp(r'^[^@]+@[^@]+\.[^@]+');
+    return regex.hasMatch(email);
+  }
+
+  void _showDialog(BuildContext context, String message) {
+    showDialog(
+      context: context,
+      builder: (BuildContext ctx) {
+        return AlertDialog(
+          title: const Text('Message'),
+          content: Text(message),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () => Navigator.of(ctx).pop(),
+              child: const Text('OK'),
+            ),
+          ],
+        );
+      },
     );
   }
 }
